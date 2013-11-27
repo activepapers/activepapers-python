@@ -1,0 +1,255 @@
+#!python
+# -*- python -*-
+
+import argparse
+import logging
+import os
+import sys
+
+import activepapers
+import activepapers.cli
+
+
+##################################################
+
+parser = argparse.ArgumentParser(description="Management of ActivePapers",
+                                 version=activepapers.__version__)
+parser.add_argument('-p', '--paper', type=str,
+                    help="name of the HDF5 file containing the ActivePaper")
+parser.add_argument('--log', type=str,
+                    help="logging level (default: WARNING)")
+parser.add_argument('--logfile', type=str,
+                    help="name of the file to which logging "
+                         "information is written")
+subparsers = parser.add_subparsers(help="commands")
+
+##################################################
+
+create_parser = subparsers.add_parser('create', help="Create a new ActivePaper")
+create_parser.add_argument('-d', metavar='DEPENDENCY',
+                           type=str, action='append',
+                           help="Python packages that the ActivePaper "
+                                "depends on")
+create_parser.set_defaults(func=activepapers.cli.create)
+
+##################################################
+
+ls_parser = subparsers.add_parser('ls', help="Show datasets")
+ls_parser.add_argument('--long', '-l', action='store_true',
+                       help="long format")
+ls_parser.add_argument('--type', '-t',
+                       help="show only items of the given type")
+ls_parser.add_argument('pattern', nargs='*',
+                       help="name pattern")
+ls_parser.set_defaults(func=activepapers.cli.ls)
+
+##################################################
+
+rm_parser = subparsers.add_parser('rm', help="Remove datasets and "
+                                             "everything depending on them")
+rm_parser.add_argument('--force', '-f', action='store_true',
+                       help="no confirmation prompt")
+rm_parser.add_argument('pattern', nargs='*',
+                       help="name pattern")
+rm_parser.set_defaults(func=activepapers.cli.rm)
+
+##################################################
+
+dummy_parser = subparsers.add_parser('dummy', help="Replace datasets by "
+                                                   "dummies")
+dummy_parser.add_argument('--force', '-f', action='store_true',
+                       help="no confirmation prompt")
+dummy_parser.add_argument('pattern', nargs='*',
+                       help="name pattern")
+dummy_parser.set_defaults(func=activepapers.cli.dummy)
+
+##################################################
+
+set_parser = subparsers.add_parser('set', help="Set dataset to the value "
+                                               "of a Python expression")
+set_parser.add_argument('dataset', type=str, help="dataset name")
+set_parser.add_argument('expr', type=str, help="expression")
+set_parser.set_defaults(func=activepapers.cli.set_)
+
+##################################################
+
+group_parser = subparsers.add_parser('group', help="Create group")
+group_parser.add_argument('group_name', type=str, help="group name")
+group_parser.set_defaults(func=activepapers.cli.group)
+
+##################################################
+
+extract_parser = subparsers.add_parser('extract',
+                                       help="Copy internal file or "
+                                            " source code item to a file")
+extract_parser.add_argument('dataset', type=str, help="dataset name")
+extract_parser.add_argument('filename',type=str,
+                            help="name of file to extract to")
+extract_parser.set_defaults(func=activepapers.cli.extract)
+
+##################################################
+
+calclet_parser = subparsers.add_parser('calclet',
+                                       help="Store a calclet"
+                                            " inside the ActivePaper")
+calclet_parser.add_argument('dataset', type=str, help="dataset name")
+calclet_parser.add_argument('filename',type=str,
+                            help="name of the Python script")
+calclet_parser.add_argument('--run', '-r', action='store_true',
+                            help="run the calclet")
+calclet_parser.set_defaults(func=activepapers.cli.calclet)
+
+##################################################
+
+importlet_parser = subparsers.add_parser('importlet',
+                                         help="Store a importlet"
+                                              " inside the ActivePaper")
+importlet_parser.add_argument('dataset', type=str, help="dataset name")
+importlet_parser.add_argument('filename',type=str,
+                              help="name of the Python script")
+importlet_parser.add_argument('--run', '-r', action='store_true',
+                              help="run the importlet")
+importlet_parser.set_defaults(func=activepapers.cli.importlet)
+
+##################################################
+
+import_parser = subparsers.add_parser('import',
+                                      help="Import a Python module"
+                                           " into the ActivePaper")
+import_parser.add_argument('module',type=str,
+                           help="name of the Python module")
+import_parser.set_defaults(func=activepapers.cli.import_module)
+
+##################################################
+
+run_parser = subparsers.add_parser('run',
+                                help="Run a calclet or importlet")
+run_parser.add_argument('codelet', type=str, help="codelet name")
+run_parser.add_argument('--debug', '-d', action='store_true',
+                         help="drop into the debugger in case of an exception")
+run_parser.add_argument('--profile',
+                         help="run under profiler control")
+run_parser.add_argument('--checkin', '-c', action='store_true',
+                         help="do 'checkin code' before running the codelet")
+run_parser.set_defaults(func=activepapers.cli.run)
+
+##################################################
+
+update_parser = subparsers.add_parser('update',
+                                      help="Update dummy or stale datasets "
+                                           "by running the required calclets")
+update_parser.add_argument('--verbose', '-v', action='store_true',
+                           help="show each step being executed")
+update_parser.set_defaults(func=activepapers.cli.update)
+
+##################################################
+
+checkin_parser = subparsers.add_parser('checkin',
+                                       help="Update files, code, and text"
+                                            "from the working directory")
+checkin_parser.add_argument('--type', '-t',
+                             help="ActivePapers datatype")
+checkin_parser.add_argument('file', nargs='*',
+                             help="filename")
+checkin_parser.add_argument('--force', '-f', action='store_true',
+                             help="Update even if replacement is older")
+checkin_parser.add_argument('--dry-run', '-n', action='store_true',
+                             help="Display actions but don't execute them")
+checkin_parser.set_defaults(func=activepapers.cli.checkin)
+
+##################################################
+
+checkout_parser = subparsers.add_parser('checkout',
+                                        help="Extract all files, code, and"
+                                             "text to the working directory")
+checkout_parser.add_argument('--type', '-t',
+                             help="check out only items of the given type")
+checkout_parser.add_argument('pattern', nargs='*',
+                             help="name pattern")
+checkout_parser.add_argument('--dry-run', '-n', action='store_true',
+                             help="Display actions but don't execute them")
+checkout_parser.set_defaults(func=activepapers.cli.checkout)
+
+##################################################
+
+ln_parser = subparsers.add_parser('ln',
+                                  help="Create a link to another ActivePaper")
+ln_parser.add_argument('reference', type=str, help="reference to a dataset "
+                                                   "in another ActivePaper")
+ln_parser.add_argument('name', type=str, help="name of the link")
+ln_parser.set_defaults(func=activepapers.cli.ln)
+
+##################################################
+
+cp_parser = subparsers.add_parser('cp',
+                                  help="Copy a dataset or group from "
+                                        "another ActivePaper")
+cp_parser.add_argument('reference', type=str, help="reference to a dataset "
+                                                   "in another ActivePaper")
+cp_parser.add_argument('name', type=str, help="name of the copy")
+cp_parser.set_defaults(func=activepapers.cli.cp)
+
+##################################################
+
+refs_parser = subparsers.add_parser('refs',
+                                  help="Show references to other ActivePapers")
+refs_parser.add_argument('--verbose', '-v', action='store_true',
+                         help="Display referenced items")
+refs_parser.set_defaults(func=activepapers.cli.refs)
+
+##################################################
+
+edit_parser = subparsers.add_parser('edit',
+                                     help="Edit an extractable dataset")
+edit_parser.add_argument('dataset', type=str, help="dataset name")
+edit_parser.set_defaults(func=activepapers.cli.edit)
+
+##################################################
+
+console_parser = subparsers.add_parser('console',
+                                       help="Run a Python interactive console"
+                                            " inside the ActivePaper")
+console_parser.add_argument('--modify', '-m', action='store_true',
+                            help="Permit modifications (use with care)")
+console_parser.set_defaults(func=activepapers.cli.console)
+
+##################################################
+
+ipython_parser = subparsers.add_parser('ipython',
+                                       help="Run an IPython shell"
+                                            " inside the ActivePaper")
+ipython_parser.add_argument('--modify', '-m', action='store_true',
+                            help="Permit modifications (use with care)")
+ipython_parser.set_defaults(func=activepapers.cli.ipython)
+
+##################################################
+
+def setup_logging(log, logfile):
+    if log is None:
+        log = "WARNING"
+    if log not in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
+        sys.stderr.write("invalid logging level %s\n" % log)
+    opts = dict(level=getattr(logging, log),
+                format="%(asctime)s %(levelname)s: %(message)s",
+                datefmt="%Y-%m-%d/%H:%M:%S")
+    if logfile is not None:
+        opts["filename"] = logfile
+        opts["filemode"] = "a"
+    logging.basicConfig(**opts)
+
+##################################################
+
+parsed_args = parser.parse_args()
+func = parsed_args.func
+args = dict(parsed_args.__dict__)
+setup_logging(args['log'], args['logfile'])
+del args['func']
+del args['log']
+del args['logfile']
+try:
+    func(**args)
+except activepapers.cli.CLIExit:
+    pass
+finally:
+    logging.shutdown()
+
