@@ -1,9 +1,9 @@
-ActivePapers.Py is a tool for working with executable papers, which
+ActivePapers is a tool for working with executable papers, which
 combine data, code, and documentation in single-file packages,
 suitable for publication as supplementary material or on sites such as
-Figshare.
+[figshare](http://figshare.com).
 
-The ActivePapers.Py system requires Python 2.7 or Python 3.x
+The ActivePapers Python edition requires Python 2.7 or Python 3.2/3.3
 plus the following libraries:
 
   - NumPy 1.6 or later (http://numpy.scipy.org/)
@@ -13,20 +13,22 @@ plus the following libraries:
 
 Installation of ActivePapers.Py:
 
-   python setup.py install
+    python setup.py install
 
 This installs the ActivePapers Python library and
 the command-line tool "aptool" for managing
 ActivePapers.
 
-For documentation, see the [[https://bitbucket.org/khinsen/active_papers_py/wiki/Home][ActivePapers Wiki]].
+For documentation, see the
+[ActivePapers Web site](http://www.activepapers.org/python-edition/).
 
-ActivePapers development takes place on Bitbucket:
- https://bitbucket.org/khinsen/active_papers_py
+ActivePapers development takes place
+[on Github](http://github.com/activepapers/activepapers-python).
 
-Runnning the tests also requires the nose library
-(http://pypi.python.org/pypi/nose/). Once it is installed, run
+Runnning the tests also requires the
+[nose library](http://pypi.python.org/pypi/nose/).
+Once it is installed, run
 
-   nosetests
+    nosetests
 
 from this directory.
