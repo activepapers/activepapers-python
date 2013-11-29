@@ -9,7 +9,7 @@ package_dir = "lib"
 script_dir = "scripts"
 
 
-with open('README.txt') as file:
+with open('README.md') as file:
     long_description = file.read()
 
 setup(name='ActivePapers.Py',
