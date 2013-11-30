@@ -22,13 +22,9 @@ import activepapers.version
 readme_text = """
 This file is an ActivePaper (Python edition).
 
-The ActivePaper software is available at:
-
-  http://bitbucket.org/khinsen/active_papers_py
-
 For more information about ActivePapers see:
 
-  http://dirac.cnrs-orleans.fr/plone/software/activepapers
+  http://www.activepapers.org/
 """
 
 
