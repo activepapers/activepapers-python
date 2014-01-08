@@ -135,6 +135,8 @@ class ActivePaper(object):
             del self._local_modules
             self.open = False
             self.file.close()
+            paper_id = hex(id(self))[2:]
+            del paper_registry[paper_id]
 
     def __del__(self):
         self.close()
@@ -248,9 +250,11 @@ class ActivePaper(object):
             if file is None:
                 raise ValueError("%s is not a Python module" % name)
             if kind != imp.PY_SOURCE:
+                file.close()
                 raise ValueError("%s is not a Python source code file"
                                  % filename)
         self.add_module(name, ascii(file.read()))
+        file.close()
         self.imported_modules[name] = package
         return package
 
