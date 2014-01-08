@@ -1,1 +1,1 @@
-from urllib.request import urlopen, urlretrieve
+from urllib.request import urlopen, urlretrieve, HTTPError
