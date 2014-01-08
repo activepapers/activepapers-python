@@ -72,8 +72,10 @@ class ActivePaper(object):
                     assert isstring(module_name)
                     importlib.import_module(module_name)
                 self.dependencies = dependencies
-                deps.create_dataset('python-packages',
-                                    data = dependencies)
+                ds = deps.create_dataset('python-packages',
+                                         dtype = h5vstring,
+                                         shape = (len(dependencies),))
+                ds[:] = dependencies
             htype = np.dtype([('opened', np.int64),
                               ('closed', np.int64),
                               ('platform', h5vstring),
