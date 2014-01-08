@@ -12,8 +12,7 @@ import activepapers.cli
 
 ##################################################
 
-parser = argparse.ArgumentParser(description="Management of ActivePapers",
-                                 version=activepapers.__version__)
+parser = argparse.ArgumentParser(description="Management of ActivePapers")
 parser.add_argument('-p', '--paper', type=str,
                     help="name of the HDF5 file containing the ActivePaper")
 parser.add_argument('--log', type=str,
@@ -21,6 +20,8 @@ parser.add_argument('--log', type=str,
 parser.add_argument('--logfile', type=str,
                     help="name of the file to which logging "
                          "information is written")
+parser.add_argument('--version', action='version',
+                    version=activepapers.__version__)
 subparsers = parser.add_subparsers(help="commands")
 
 ##################################################

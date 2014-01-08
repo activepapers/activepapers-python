@@ -13,8 +13,13 @@ with open('README.md') as file:
     long_description = file.read()
     long_description = long_description[:long_description.find("\n\n")]
 
+class Dummy:
+    pass
+version = Dummy()
+exec(open('lib/activepapers/version.py').read(), version.__dict__)
+
 setup(name='ActivePapers.Py',
-      version='0.1',
+      version=version.version,
       description='Executable papers containing Python code',
       long_description=long_description,
       author='Konrad Hinsen',
