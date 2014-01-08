@@ -46,20 +46,62 @@ def find_in_library(paper_ref):
         if os.path.exists(local_filename):
             return local_filename
 
-        # Only figshare is supported for downloading at the moment.
-        # There doesn't seem to be a way to download an
-        # arbitrary digital object through its DOI.
-        figshare_url = "http://api.figshare.com/v1/articles/%s" % label
-        try:
-            response = url.urlopen(figshare_url)
-            json_data = response.read().decode("utf-8")
-        except urllib2.HTTPError:
-            raise ValueError("Not a figshare DOI: %s" % label)
-        article_details = json.loads(json_data)
-        download_url = article_details['items'][0]['files'][0]['download_url']
         dir_name = os.path.join(library[0], label.split("/")[0])
         if not os.path.exists(dir_name):
             os.mkdir(dir_name)
-        url.urlretrieve(download_url, local_filename)
-        return local_filename
+
+        # There doesn't seem to be a way to download an
+        # arbitrary digital object through its DOI. We know
+        # know how to do it for figshare and Zenodo, which are
+        # each handled by specialized code.
+
+        # Figshare
+        if 'figshare' in label:
+            figshare_url = "http://api.figshare.com/v1/articles/%s" % label
+            try:
+                response = url.urlopen(figshare_url)
+                json_data = response.read().decode("utf-8")
+            except url.HTTPError:
+                raise ValueError("Not a figshare DOI: %s" % label)
+            article_details = json.loads(json_data)
+            download_url = article_details['items'][0]['files'][0]['download_url']
+            url.urlretrieve(download_url, local_filename)
+            return local_filename
+
+        # Zenodo
+        elif 'zenodo' in label:
+
+            try:
+                # Python 2
+                from HTMLParser import HTMLParser
+                bytes2text = lambda x: x
+            except ImportError:
+                # Python 3
+                from html.parser import HTMLParser
+                def bytes2text(b):
+                    return b.decode(encoding="utf8")
+            class ZenodoParser(HTMLParser):
+                def handle_starttag(self, tag, attrs):
+                    if tag == "link":
+                        attrs = dict(attrs)
+                        if attrs.get("rel") == "alternate" \
+                           and attrs.get("type") != "application/rss+xml":
+                            self.link_href = attrs.get("href")
+                            self.link_type = attrs.get("type")
+
+            zenodo_url = "http://dx.doi.org/" + label
+            parser = ZenodoParser()
+            source = url.urlopen(zenodo_url)
+            try:
+                parser.feed(bytes2text(source.read()))
+            finally:
+                source.close()
+            assert parser.link_type == "application/octet-stream"
+            download_url = parser.link_href
+            url.urlretrieve(download_url, local_filename)
+            return local_filename
+
+        else:
+            raise ValueError("Unrecognized DOI: %s" % label)
+
 
