@@ -296,7 +296,7 @@ class ActivePaper(object):
             stack = traceback.extract_tb(trace)
             del trace
 
-            while True:
+            while stack:
                 if stack[0][2] == 'execstring':
                     del stack[0]
                     break
