@@ -99,6 +99,7 @@ class Codelet(object):
                 for name, module in self.paper._local_modules.items():
                     assert name not in sys.modules
                     sys.modules[name] = module
+                sys.modules['activepapers.contents'] = self._contents_module
                 execstring(script, environment)
             finally:
                 del codelet_registry[(paper_id, self.path)]
@@ -498,8 +499,6 @@ class Importer(object):
         codelet, paper = get_codelet_and_paper()
         if paper is None or codelet is None:
             return None
-        if fullname == 'activepapers.contents':
-            return APContentsLoader(codelet)
         node = paper.get_local_module(fullname)
         if node is None:
             # No corresponding node found
@@ -517,17 +516,6 @@ class Importer(object):
             # Node found but is not a Python module
             return None
         return ModuleLoader(paper, fullname, node, is_package)
-
-
-class APContentsLoader(object):
-
-    def __init__(self, codelet):
-        self.codelet = codelet
-
-    def load_module(self, fullname):
-        assert fullname == 'activepapers.contents'
-        sys.modules[fullname] = self.codelet._contents_module
-        return self.codelet._contents_module
 
 
 class ModuleLoader(object):
