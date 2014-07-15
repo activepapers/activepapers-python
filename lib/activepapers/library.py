@@ -64,23 +64,28 @@ def _get_zenodo_doi(label, local_filename):
         def bytes2text(b):
             return b.decode(encoding="utf8")
     class ZenodoParser(HTMLParser):
+        def __init__(self, url_prefix):
+            HTMLParser.__init__(self)
+            self.url_prefix = url_prefix
+            self.file_links = set()
         def handle_starttag(self, tag, attrs):
-            if tag == "link":
+            if tag == "a":
                 attrs = dict(attrs)
-                if attrs.get("rel") == "alternate" \
-                   and attrs.get("type") != "application/rss+xml":
-                    self.link_href = attrs.get("href")
-                    self.link_type = attrs.get("type")
+                url = attrs.get('href')
+                if url is not None and url.startswith(self.url_prefix) \
+                   and url.endswith('.ap'):
+                    self.file_links.add(url)
 
     zenodo_url = "http://dx.doi.org/" + label
-    parser = ZenodoParser()
     source = url.urlopen(zenodo_url)
+    prefix = source.url + '/files/'
+    parser = ZenodoParser(prefix)
     try:
         parser.feed(bytes2text(source.read()))
     finally:
         source.close()
-    assert parser.link_type == "application/octet-stream"
-    download_url = parser.link_href
+    assert len(parser.file_links) == 1
+    download_url = parser.file_links.pop()
     url.urlretrieve(download_url, local_filename)
     return local_filename
 
