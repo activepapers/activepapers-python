@@ -188,6 +188,9 @@ def test_copy():
             source = item.attrs.get('ACTIVE_PAPER_COPIED_FROM')
             assert source is not None
             paper_ref, ref_path = source
-            assert ascii(paper_ref.flat[0]) == "local:simple1"
-            assert ascii(ref_path.flat[0]) == path
+            if h5py.version.version_tuple[:2] <= (2, 2):
+                paper_ref = paper_ref.flat[0]
+                ref_path = ref_path.flat[0]
+            assert ascii(paper_ref) == "local:simple1"
+            assert ascii(ref_path) == path
 

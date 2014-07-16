@@ -426,7 +426,11 @@ class ActivePaper(object):
             elif 'ACTIVE_PAPER_COPIED_FROM' in node.attrs:
                 source = node.attrs['ACTIVE_PAPER_COPIED_FROM']
                 paper_ref, ref_path = source
-                refs[paper_ref.flat[0]][1].add(ref_path.flat[0])
+                if h5py.version.version_tuple[:2] <= (2, 2):
+                    # h5py 2.2 returns a wrong dtype
+                    paper_ref = paper_ref.flat[0]
+                    ref_path = ref_path.flat[0]
+                refs[paper_ref][1].add(ref_path)
             if isinstance(node, h5py.Group):
                 for item in node:
                     process(node[item], refs)
