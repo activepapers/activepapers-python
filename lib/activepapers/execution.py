@@ -497,7 +497,7 @@ class Importer(object):
 
     def find_module(self, fullname, path=None):
         codelet, paper = get_codelet_and_paper()
-        if paper is None or codelet is None:
+        if paper is None:
             return None
         node = paper.get_local_module(fullname)
         if node is None:
