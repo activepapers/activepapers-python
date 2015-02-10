@@ -524,7 +524,9 @@ class ModuleLoader(object):
         self.paper = paper
         self.fullname = fullname
         self.node = node
-        self.is_package = is_package
+        # Python 3.4 has special treatment for loaders that
+        # have an attribute 'is_package'.
+        self._is_package = is_package
 
     def load_module(self, fullname):
         assert fullname == self.fullname
@@ -539,7 +541,7 @@ class ModuleLoader(object):
         module.__file__ = os.path.abspath(self.node.file.filename) + ':' + \
                           self.node.name
         module.__loader__ = self
-        if self.is_package:
+        if self._is_package:
             module.__path__ = []
             module.__package__ = fullname
         else:
