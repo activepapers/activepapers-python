@@ -1,15 +1,18 @@
-Release 0.1.2
+Release 0.1.4
 -------------
 
-This is a bugfix release, fixing the following issues:
+New features:
 
- - A compatibility problem with h5py 2.3
+  - Python scripts are stored using UTF-8 encoding rather than ASCII.
 
- - Broken downloads from Zenodo, following a modification of the contents
-   of the Zenodo landing pages.
+  - Internal files can be opened using an option "encoding" argument.
+    If this is used, strings read from and written to such files
+    are unicode strings.
 
- - Syntax errors in codelets were not reported correctly.
+Bug fixes:
 
+ - A change in importlib in Python 3.4 broke the import of modules
+   stored in an ActivePaper.
 
 Release 0.1.3
 -------------
@@ -27,3 +30,16 @@ Bug fixes:
    of the Zenodo landing pages. Actually, Zenodo went back to the
    landing page format it had before ActivePapers release 0.1.2,
    so ActivePapers also went back to how it downloaded files before.
+
+
+Release 0.1.2
+-------------
+
+This is a bugfix release, fixing the following issues:
+
+ - A compatibility problem with h5py 2.3
+
+ - Broken downloads from Zenodo, following a modification of the contents
+   of the Zenodo landing pages.
+
+ - Syntax errors in codelets were not reported correctly.
