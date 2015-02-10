@@ -12,7 +12,7 @@ import weakref
 import numpy as np
 import h5py
 
-from activepapers.utility import ascii, h5vstring, isstring, execstring, \
+from activepapers.utility import ascii, utf8, h5vstring, isstring, execstring, \
                                  codepath, datapath, owner, mod_time, \
                                  datatype, timestamp, stamp, ms_since_epoch
 from activepapers.execution import Calclet, Importlet, DataGroup, paper_registry
@@ -136,7 +136,10 @@ class ActivePaper(object):
             self.open = False
             self.file.close()
             paper_id = hex(id(self))[2:]
-            del paper_registry[paper_id]
+            try:
+                del paper_registry[paper_id]
+            except KeyError:
+                pass
 
     def __del__(self):
         self.close()
@@ -218,10 +221,11 @@ class ActivePaper(object):
     def store_python_code(self, path, code):
         self.assert_is_open()
         if not isstring(code):
-            raise TypeError("Python code must be a string")
+            raise TypeError("Python code must be a string (is %s)"
+                            % str(type(code)))
         ds = self.code_group.require_dataset(path,
                                              dtype=h5vstring, shape = ())
-        ds[...] = code
+        ds[...] = code.encode('utf-8')
         ds.attrs['ACTIVE_PAPER_LANGUAGE'] = "python"
         return ds
 
@@ -313,7 +317,7 @@ class ActivePaper(object):
                         paper_name = '<%s>' % paper.file.filename
                     filename = ':'.join([paper_name, codelet])
                     if code is None and paper is not None:
-                        script = paper.file[codelet][...].flat[0]
+                        script = utf8(paper.file[codelet][...].flat[0])
                         code = script.split('\n')[lineno-1]
                 fstack.append((filename, lineno, fn_name, code))
 
@@ -534,7 +538,7 @@ class ActivePaper(object):
             clone.attrs[attr_name] = self.file.attrs[attr_name]
         clone.close()
 
-    def open_internal_file(self, path, mode='r', creator=None):
+    def open_internal_file(self, path, mode='r', encoding=None, creator=None):
         # path is always relative to the root group
         if path.startswith('/'):
             path = path[1:]
@@ -558,7 +562,7 @@ class ActivePaper(object):
                        chunks = (100,), maxshape = (None,))
         else:
             raise ValueError("unknown file mode %s" % mode)
-        return InternalFile(ds, mode)
+        return InternalFile(ds, mode, encoding)
 
 
 #
@@ -588,9 +592,10 @@ class ExternalCode(object):
 
 class InternalFile(io.IOBase):
 
-    def __init__(self, ds, mode):
+    def __init__(self, ds, mode, encoding=None):
         self._ds = ds
         self._mode = mode
+        self._encoding = encoding
         self._position = 0
         self._closed = False
         self._binary = 'b' in mode
@@ -622,6 +627,8 @@ class InternalFile(io.IOBase):
     def _convert(self, data):
         if self._binary:
             return data
+        elif self._encoding is not None:
+            return data.decode(self._encoding)
         else:
             return ascii(data)
 
@@ -720,6 +727,8 @@ class InternalFile(io.IOBase):
             # HDF5 crashes when trying to write a zero-length
             # slice, so this must be handled as a special case.
             return
+        if self._encoding is not None:
+            string = string.encode(self._encoding)
         new_position = self._position + len(string)
         if new_position > len(self._ds):
             self._ds.resize((new_position,))

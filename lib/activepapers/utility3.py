@@ -6,6 +6,11 @@ def ascii(string):
         return bytes.decode(string, 'ASCII')
     return string
 
+def utf8(string):
+    if isinstance(string, bytes):
+        return bytes.decode(string, 'utf-8')
+    return string
+
 def py_str(byte_string):
     if isinstance(byte_string, np.ndarray):
         byte_string = bytes(byte_string)

@@ -1,4 +1,5 @@
 # Test specific features of ActivePapers
+# coding: utf-8
 
 import os
 import numpy as np
@@ -185,6 +186,14 @@ with open('empty', 'w') as f:
     pass
 """)
         script.run()
+        script = paper.create_calclet("write4",
+u"""
+from activepapers.contents import open
+
+with open('utf8', 'w', encoding='utf-8') as f:
+    f.write(u'déjà')
+""")
+        script.run()
         script = paper.create_calclet("read1",
 """
 from activepapers.contents import open
@@ -213,6 +222,16 @@ f = open('empty')
 data = f.read()
 f.close()
 assert len(data) == 0
+""")
+        script.run()
+        script = paper.create_calclet("read4",
+u"""
+from activepapers.contents import open
+
+f = open('utf8', encoding='utf-8')
+data = f.read()
+f.close()
+assert data == u'déjà'
 """)
         script.run()
         script = paper.create_calclet("convert_to_binary",
@@ -247,13 +266,14 @@ with open_documentation('hello.txt', 'w') as f:
         script.run()
         h = [sorted(list(ascii(item.name) for item in step))
              for step in paper.dependency_hierarchy()]
+        print(h)
         assert h == [['/code/convert_to_binary',
                       '/code/read1', '/code/read2', '/code/read3',
-                      '/code/read_binary',
+                      '/code/read4', '/code/read_binary',
                       '/code/write1', '/code/write2', '/code/write3',
-                      '/code/write_documentation'],
+                      '/code/write4', '/code/write_documentation'],
                      ['/data/empty', '/data/numbers', '/data/numbers1',
-                      '/documentation/hello.txt'],
+                      '/data/utf8', '/documentation/hello.txt'],
                      ['/data/binary_numbers']]
         paper.close()
 

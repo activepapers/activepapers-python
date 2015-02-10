@@ -169,8 +169,8 @@ def update_from_file(paper, filename, type=None,
                          % (basename, fulltype, filename))
     else:
         if type in ['calclet', 'importlet', 'module']:
-            item = paper.store_python_code(basename[5:],
-                                          open(filename, 'rb').read())
+            code = open(filename, 'rb').read().decode('utf-8')
+            item = paper.store_python_code(basename[5:], code)
             stamp(item, type, {})
             timestamp(item, mtime)
         elif type in ['file', 'text']:

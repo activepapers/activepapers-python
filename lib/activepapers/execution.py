@@ -11,7 +11,7 @@ import h5py
 import numpy as np
 
 import activepapers.utility
-from activepapers.utility import ascii, isstring, execstring, \
+from activepapers.utility import ascii, utf8, isstring, execstring, \
                                  codepath, datapath, path_in_section, owner, \
                                  datatype, timestamp, stamp, ms_since_epoch
 import activepapers.standardlib
@@ -55,7 +55,7 @@ class Codelet(object):
     def owns(self, node):
         return owner(node) == self.path
 
-    def _open_file(self, path, mode, section):
+    def _open_file(self, path, mode, encoding, section):
         if path.startswith(os.path.expanduser('~')):
             # Catch obvious attempts to access real files
             # rather than internal ones.
@@ -63,17 +63,17 @@ class Codelet(object):
         path = path_in_section(path, section)
         if not path.startswith('/'):
             path = section + '/' + path
-        f = self.paper.open_internal_file(path, mode, self)
+        f = self.paper.open_internal_file(path, mode, encoding, self)
         f._set_attribute_callback(self.dependency_attributes)
         if mode[0] == 'r':
             self.add_dependency(f._ds.name)
         return f
 
-    def open_data_file(self, path, mode='r'):
-        return self._open_file(path, mode, '/data')
+    def open_data_file(self, path, mode='r', encoding=None):
+        return self._open_file(path, mode, encoding, '/data')
 
-    def open_documentation_file(self, path, mode='r'):
-        return self._open_file(path, mode, '/documentation')
+    def open_documentation_file(self, path, mode='r', encoding=None):
+        return self._open_file(path, mode, encoding, '/documentation')
 
     def _run(self, environment):
         logging.info("Running %s %s"
@@ -82,7 +82,7 @@ class Codelet(object):
         # A string uniquely identifying the paper from which the
         # calclet is called. Used in Importer.
         paper_id = hex(id(self.paper))[2:]
-        script = ascii(self.node[...].flat[0])
+        script = utf8(self.node[...].flat[0])
         script = compile(script, ':'.join([paper_id, self.path]), 'exec')
         self._contents_module = imp.new_module('activepapers.contents')
         self._contents_module.data = DataGroup(self.paper, None,

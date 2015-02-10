@@ -4,6 +4,9 @@ import h5py
 def ascii(string):
     return string
 
+def utf8(string):
+    return string.decode('utf-8')
+
 def py_str(byte_string):
     if isinstance(byte_string, np.ndarray):
         return str(byte_string)
