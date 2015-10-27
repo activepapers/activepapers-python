@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import h5py
 
@@ -19,9 +20,15 @@ def isstring(s):
 
 def execstring(s, globals, locals=None):
     if locals is None:
-        exec s in globals
+        if sys.version[0] == '2':
+            exec s in globals
+        else:
+            exec(s, globals)
     else:
-        exec s in globals, locals
+        if sys.version[0] == '2':
+            exec s in globals, locals
+        else:
+            exec(s, globals, locals)
 
 h5vstring = h5py.special_dtype(vlen=str)
 
