@@ -13,18 +13,23 @@ class ActivePaper(object):
             raise IOError("Only one ActivePaper per process can use code.")
         try:
             self.paper = open_paper_ref(file_or_ref)
-            self.data = self.paper.data
-            self.documentation = self.paper.documentation_group
-            self.code = self.paper.code_group
-        except IOError:
+        except ValueError:
             self.paper = ActivePaperStorage(file_or_ref, 'r')
+        self.data = self.paper.data
+        self.documentation = self.paper.documentation_group
+        self.code = self.paper.code_group
         try:
             self.__doc__ = self.open_documentation('README').read()
         except KeyError:
             pass
         if use_code:
             _paper_for_code = self.paper
-            
+
+    def close(self):
+        global _paper_for_code
+        if _paper_for_code is self.paper:
+            _paper_for_code = None
+
     def _open(self, path, section):
         path = path_in_section(path, section)
         if not path.startswith('/'):
