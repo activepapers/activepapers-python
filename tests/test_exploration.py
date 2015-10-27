@@ -25,7 +25,7 @@ def my_func(x):
     paper.close()
 
 def check_local_paper(filename):
-    ap = ActivePaperExploration(filename, use_code=True)
+    ap = ActivePaperExploration(filename)
     from my_math import my_func
     frequency = ap.data['frequency'][...]
     time = ap.data['time'][...]
@@ -33,7 +33,7 @@ def check_local_paper(filename):
     assert (sine == np.sin(2.*np.pi*frequency*time)).all()
     ap.close()
 
-def test_paper_exploration():
+def test_local_paper():
     with tempdir.TempDir() as t:
         filename = os.path.join(t, "test.ap")
 
@@ -43,7 +43,7 @@ def test_paper_exploration():
 def test_published_paper():
     with tempdir.TempDir() as t:
         library.library = [t]
-        ap = ActivePaperExploration("doi:10.6084/m9.figshare.808595", use_code=True)
+        ap = ActivePaperExploration("doi:10.6084/m9.figshare.808595")
         import time_series
         ts = np.arange(10)
         assert time_series.integral(ts, 1)[-1] == 40.5

@@ -7,14 +7,18 @@ from activepapers.utility import path_in_section
 
 class ActivePaper(object):
 
-    def __init__(self, file_or_ref, use_code=False):
+    def __init__(self, file_or_ref, use_code=True):
         global _paper_for_code
-        if use_code and _paper_for_code is not None:
-            raise IOError("Only one ActivePaper per process can use code.")
         try:
             self.paper = open_paper_ref(file_or_ref)
         except ValueError:
             self.paper = ActivePaperStorage(file_or_ref, 'r')
+        if use_code and ("python-packages" not in self.paper.code_group \
+                         or len(self.paper.code_group["python-packages"]) == 0):
+            # The paper contains no importable modules or packages.
+            use_code = False
+        if use_code and _paper_for_code is not None:
+            raise IOError("Only one ActivePaper per process can use code.")
         self.data = self.paper.data
         self.documentation = self.paper.documentation_group
         self.code = self.paper.code_group
