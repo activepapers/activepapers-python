@@ -10,4 +10,4 @@ from builtins import __build_class__
 del eval
 del input
 del open
-del quit
+#del quit
