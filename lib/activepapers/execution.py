@@ -512,7 +512,7 @@ class Importer(object):
             is_package = True
             node = node['__init__']
         if datatype(node) != "module" \
-           or node.attrs.get("ACTIVE_PAPER_LANGUAGE", None) != "python":
+           or ascii(node.attrs.get("ACTIVE_PAPER_LANGUAGE", "")) != "python":
             # Node found but is not a Python module
             return None
         return ModuleLoader(paper, fullname, node, is_package)
