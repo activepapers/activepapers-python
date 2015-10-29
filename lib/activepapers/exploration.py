@@ -34,17 +34,19 @@ class ActivePaper(object):
         if _paper_for_code is self.paper:
             _paper_for_code = None
 
-    def _open(self, path, section):
+    def _open(self, path, section, mode='r'):
+        if mode not in ['r', 'rb']:
+            raise ValueError("invalid mode: " + repr(mode))
         path = path_in_section(path, section)
         if not path.startswith('/'):
             path = section + '/' + path
-        return self.paper.open_internal_file(path, 'r', None)
+        return self.paper.open_internal_file(path, mode, None)
 
-    def open(self, path):
-        return self._open(path, '/data')
+    def open(self, path, mode='r'):
+        return self._open(path, '/data', mode)
 
-    def open_documentation(self, path):
-        return self._open(path, '/documentation')
+    def open_documentation(self, path, mode='r'):
+        return self._open(path, '/documentation', mode)
 
 _paper_for_code = None
 def _get_codelet_and_paper():
