@@ -45,6 +45,9 @@ class ActivePaper(object):
     def open(self, path, mode='r'):
         return self._open(path, '/data', mode)
 
+    def open_code(self, path, mode='r'):
+        return self._open(path, '/code', mode)
+
     def open_documentation(self, path, mode='r'):
         return self._open(path, '/documentation', mode)
 
