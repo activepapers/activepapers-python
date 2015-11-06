@@ -543,8 +543,7 @@ class ActivePaper(object):
         if path.startswith('/'):
             path = path[1:]
         if not path.startswith('data/') \
-           and not path.startswith('documentation/') \
-           and not path.startswith('code/'):
+           and not path.startswith('documentation/'):
             raise IOError((13, "Permission denied: '%s'" % path))
         if creator is None:
             creator = ExternalCode(self)
