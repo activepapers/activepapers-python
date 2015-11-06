@@ -45,11 +45,11 @@ class ActivePaper(object):
     def open(self, path, mode='r'):
         return self._open(path, '/data', mode)
 
-    def open_code(self, file):
-        return self.code[file][...].ravel()[0].decode('utf-8')
-
     def open_documentation(self, path, mode='r'):
         return self._open(path, '/documentation', mode)
+
+    def read_code(self, file):
+        return self.code[file][...].ravel()[0].decode('utf-8')
 
 _paper_for_code = None
 def _get_codelet_and_paper():
