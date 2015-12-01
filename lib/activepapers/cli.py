@@ -507,7 +507,7 @@ def refs(paper, verbose):
     paper.close()
     sorted_refs = sorted(refs.keys())
     for ref in sorted_refs:
-        sys.stdout.write(ref + '\n')
+        sys.stdout.write(ref.decode('utf-8') + '\n')
         if verbose:
             links, copies = refs[ref]
             if links:
