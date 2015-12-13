@@ -526,7 +526,7 @@ def edit(paper, dataset):
         paper = activepapers.storage.ActivePaper(paper_name, 'r')
         ds = paper.file[dataset]
         try:
-            filename = extract_to_file(paper, ds, directory=t.name)
+            filename = extract_to_file(paper, ds, directory=str(t))
         except ValueError as exc:
             sys.stderr.write(exc.args[0] + '\n')
             raise CLIExit
