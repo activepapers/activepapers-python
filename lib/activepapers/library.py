@@ -108,9 +108,17 @@ def _get_doi(label):
     else:
         raise ValueError("Unrecognized DOI: %s" % label)
 
+def _get_file_in_cwd(label):
+    filename = label + '.ap'
+    full_name = os.path.abspath(os.path.join(os.getcwd(), filename))
+    if os.path.exists(full_name):
+        return full_name
+    raise IOError(2, "No such ActivePaper: 'cwd:%s' (filename: %s)"
+                  % (label, full_name))
 
 download_handlers = {'local': _get_local_file,
-                     'doi': _get_doi}
+                     'doi': _get_doi,
+                     'cwd': _get_file_in_cwd}
 
 def find_in_library(paper_ref):
     ref_type, label = split_paper_ref(paper_ref)
