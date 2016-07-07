@@ -113,9 +113,9 @@ class ActivePaper(object):
         else:
             self.history.resize((1+len(self.history),))
             def getversion(name):
-                try:
+                if hasattr(sys.modules[name], '__version__'):
                     return getattr(sys.modules[name], '__version__')
-                except KeyError:
+                else:
                     return 'unknown'
             self.history[-1] = (ms_since_epoch(), 0,
                                 sys.platform,
