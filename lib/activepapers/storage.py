@@ -134,7 +134,10 @@ class ActivePaper(object):
                 self.update_history(close=True)
             del self._local_modules
             self.open = False
-            self.file.close()
+            try:
+                self.file.close()
+            except:
+                pass
             paper_id = hex(id(self))[2:]
             try:
                 del paper_registry[paper_id]
@@ -795,7 +798,7 @@ class APNode(object):
         return getattr(self._h5node, attrname)
 
     def in_paper(self, paper):
-        return paper.file.id is self._h5node.file.id
+        return paper.file.id == self._h5node.file.id
 
 #
 # A global dictionary mapping paper_refs to papers.
