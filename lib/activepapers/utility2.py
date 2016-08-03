@@ -17,7 +17,7 @@ def py_str(byte_string):
 def isstring(s):
     return isinstance(s, basestring)
 
-def execstring(s, globals, locals=None):
+def execcode(s, globals, locals=None):
     if locals is None:
         exec s in globals
     else:

@@ -11,7 +11,7 @@ import h5py
 import numpy as np
 
 import activepapers.utility
-from activepapers.utility import ascii, utf8, isstring, execstring, \
+from activepapers.utility import ascii, utf8, isstring, execcode, \
                                  codepath, datapath, path_in_section, owner, \
                                  datatype, timestamp, stamp, ms_since_epoch
 import activepapers.standardlib
@@ -81,28 +81,28 @@ class Codelet(object):
         self.paper.remove_owned_by(self.path)
         # A string uniquely identifying the paper from which the
         # calclet is called. Used in Importer.
-        paper_id = hex(id(self.paper))[2:]
         script = utf8(self.node[...].flat[0])
-        script = compile(script, ':'.join([paper_id, self.path]), 'exec')
+        script = compile(script, ':'.join([self.paper._id(), self.path]), 'exec')
         self._contents_module = imp.new_module('activepapers.contents')
         self._contents_module.data = DataGroup(self.paper, None,
                                                self.paper.data_group, self)
         self._contents_module.open = self.open_data_file
         self._contents_module.open_documentation = self.open_documentation_file
         self._contents_module.snapshot = self.paper.snapshot
+        self._contents_module.run_tests = self.paper.run_tests
 
         # The remaining part of this method is not thread-safe because
         # of the way the global state in sys.modules is modified.
         with codelet_lock:
             try:
-                codelet_registry[(paper_id, self.path)] = self
+                codelet_registry[(self.paper._id(), self.path)] = self
                 for name, module in self.paper._local_modules.items():
                     assert name not in sys.modules
                     sys.modules[name] = module
                 sys.modules['activepapers.contents'] = self._contents_module
-                execstring(script, environment)
+                execcode(script, environment)
             finally:
-                del codelet_registry[(paper_id, self.path)]
+                del codelet_registry[(self.paper._id(), self.path)]
                 self._contents_module = None
                 if 'activepapers.contents' in sys.modules:
                     del sys.modules['activepapers.contents']
@@ -469,7 +469,7 @@ def get_codelet_and_paper():
     in_codelet = False
     for filename, line_no, fn_name, command in stack:
         if filename == this_module \
-           and command == "execstring(script, environment)":
+           and command == "execcode(script, environment)":
             in_codelet = True
     if not in_codelet:
         return None, None
@@ -536,7 +536,9 @@ class ModuleLoader(object):
             if isinstance(loader, ModuleLoader):
                 assert loader.paper is self.paper
             return module
-        code = ascii(self.node[...].flat[0])
+        code = compile(ascii(self.node[...].flat[0]),
+                       ':'.join([self.paper._id(), self.node.name]),
+                       'exec')
         module = imp.new_module(fullname)
         module.__file__ = os.path.abspath(self.node.file.filename) + ':' + \
                           self.node.name
@@ -549,7 +551,7 @@ class ModuleLoader(object):
         sys.modules[fullname] = module
         self.paper._local_modules[fullname] = module
         try:
-            execstring(code, module.__dict__)
+            execcode(code, module.__dict__)
         except:
             del sys.modules[fullname]
             del self.paper._local_modules[fullname]

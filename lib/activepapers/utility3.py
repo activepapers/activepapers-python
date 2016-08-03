@@ -20,11 +20,11 @@ def py_str(byte_string):
 def isstring(s):
     return isinstance(s, str)
 
-def execstring(s, globals, locals=None):
+def execcode(code, globals, locals=None):
     if locals is None:
-        exec(s, globals)
+        exec(code, globals)
     else:
-        exec(s, globals, locals)
+        exec(code, globals, locals)
 
 h5vstring = h5py.special_dtype(vlen=bytes)
 

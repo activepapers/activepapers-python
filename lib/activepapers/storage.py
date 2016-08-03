@@ -12,7 +12,7 @@ import weakref
 import numpy as np
 import h5py
 
-from activepapers.utility import ascii, utf8, h5vstring, isstring, execstring, \
+from activepapers.utility import ascii, utf8, h5vstring, isstring, execcode, \
                                  codepath, datapath, owner, mod_time, \
                                  datatype, timestamp, stamp, ms_since_epoch
 from activepapers.execution import Calclet, Importlet, DataGroup, paper_registry
@@ -103,8 +103,10 @@ class ActivePaper(object):
 
         self._local_modules = {}
 
-        paper_id = hex(id(self))[2:]
-        paper_registry[paper_id] = self
+        paper_registry[self._id()] = self
+
+    def _id(self):
+        return hex(id(self))[2:]
 
     def update_history(self, close):
         if close:
@@ -304,7 +306,7 @@ class ActivePaper(object):
             del trace
 
             while stack:
-                if stack[0][2] == 'execstring':
+                if stack[0][2] == 'execcode':
                     del stack[0]
                     break
                 del stack[0]
