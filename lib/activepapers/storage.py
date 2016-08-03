@@ -806,6 +806,16 @@ class APNode(object):
 #
 _papers = weakref.WeakValueDictionary()
 
+# Close all open referenced papers at interpreter exit,
+# in order to prevent "murdered identifiers" in h5py.
+def _cleanup():
+    for paper in activepapers.storage._papers.values():
+        paper.close()
+
+import atexit
+atexit.register(_cleanup)
+del atexit
+
 #
 # Dereference a reference node
 #
