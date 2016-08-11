@@ -76,6 +76,14 @@ class Codelet(object):
     def open_documentation_file(self, path, mode='r', encoding=None):
         return self._open_file(path, mode, encoding, '/documentation')
 
+    def exception_traceback(self):
+        from traceback import extract_tb, print_exc
+        import sys
+        tb = sys.exc_info()[2]
+        node, line, fn_name, _ = extract_tb(tb, limit=2)[1]
+        paper_id, path = node.split(':')
+        return CodeFile(self.paper, self.paper.file[path]), line, fn_name
+
     def _run(self, environment):
         logging.info("Running %s %s"
                      % (self.__class__.__name__.lower(), self.path))
@@ -92,7 +100,7 @@ class Codelet(object):
         self._contents_module.open = self.open_data_file
         self._contents_module.open_documentation = self.open_documentation_file
         self._contents_module.snapshot = self.paper.snapshot
-        self._contents_module.run_tests = self.paper.run_tests
+        self._contents_module.exception_traceback = self.exception_traceback
 
         # The remaining part of this method is not thread-safe because
         # of the way the global state in sys.modules is modified.
