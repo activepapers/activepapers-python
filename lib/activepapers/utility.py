@@ -26,6 +26,13 @@ def owner(node):
     else:
         return ascii(s)
 
+def language(node):
+    s = node.attrs.get('ACTIVE_PAPER_LANGUAGE', None)
+    if s is None:
+        return s
+    else:
+        return ascii(s)
+
 def mod_time(node):
     s = node.attrs.get('ACTIVE_PAPER_TIMESTAMP', None)
     if s is None:

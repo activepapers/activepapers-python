@@ -13,7 +13,8 @@ import numpy as np
 import activepapers.utility
 from activepapers.utility import ascii, utf8, isstring, execcode, \
                                  codepath, datapath, path_in_section, owner, \
-                                 datatype, timestamp, stamp, ms_since_epoch
+                                 datatype, language, \
+                                 timestamp, stamp, ms_since_epoch
 import activepapers.standardlib
 
 #
@@ -86,6 +87,8 @@ class Codelet(object):
         self._contents_module = imp.new_module('activepapers.contents')
         self._contents_module.data = DataGroup(self.paper, None,
                                                self.paper.data_group, self)
+        self._contents_module.code = CodeGroup(self.paper,
+                                               self.paper.code_group)
         self._contents_module.open = self.open_data_file
         self._contents_module.open_documentation = self.open_documentation_file
         self._contents_module.snapshot = self.paper.snapshot
@@ -273,8 +276,7 @@ class DatasetWrapper(object):
         return "\n".join(lines)
 
 #
-# DataGroup is a wrapper class for the "data" group in a paper,
-# which is the only group accessible to codelets.
+# DataGroup is a wrapper class for the "data" group in a paper.
 # The wrapper traces access and creation of subgroups and datasets
 # for building the dependency graph. It also maintains the illusion
 # that the data subgroup is all there is in the HDF5 file.
@@ -436,6 +438,52 @@ class DataGroup(object):
             lines = ["Group %s%s containing" % (self._node.name, owned)]
             lines.extend("   "+i for i in items)
         return "\n".join(lines)
+
+#
+# CodeGroup is a wrapper class for the "code" group in a paper.
+# The wrapper provide read-only access to codelets and modules.
+#
+
+class CodeGroup(object):
+
+    def __init__(self, paper, node):
+        self._paper = paper
+        self._node = node
+
+    def __len__(self):
+        return len(self._node)
+
+    def __iter__(self):
+        for x in self._node:
+            yield x
+
+    def __getitem__(self, path_or_ref):
+        if isstring(path_or_ref):
+            path = codepath(path_or_ref)
+        else:
+            path = self._node[path_or_ref].name
+            assert path.startswith('/code')
+        node = self._node[path]
+        if isinstance(node, h5py.Group):
+            return CodeGroup(self._paper, node)
+        else:
+            return CodeFile(self._paper, node)
+
+    def __repr__(self):
+        return "<CodeGroup %s>" % self._node.name
+
+class CodeFile(object):
+
+    def __init__(self, paper, node):
+        self._paper = paper
+        self._node = node
+        self.type = datatype(node)
+        self.language = language(node)
+        self.name = node.name
+        self.code = utf8(node[...].flat[0])
+
+    def __repr__(self):
+        return "<%s %s (%s)>" % (self.type, self.name, self.language)
 
 #
 # Initialize a paper registry that permits finding a paper
