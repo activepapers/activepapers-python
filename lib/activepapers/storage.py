@@ -146,9 +146,6 @@ class ActivePaper(object):
             except KeyError:
                 pass
 
-    def __del__(self):
-        self.close()
-
     def assert_is_open(self):
         if not self.open:
             raise ValueError("ActivePaper %s has been closed" % self.filename)
@@ -808,15 +805,15 @@ class APNode(object):
 #
 _papers = weakref.WeakValueDictionary()
 
-# Close all open referenced papers at interpreter exit,
-# in order to prevent "murdered identifiers" in h5py.
-def _cleanup():
-    for paper in activepapers.storage._papers.values():
-        paper.close()
+# # Close all open referenced papers at interpreter exit,
+# # in order to prevent "murdered identifiers" in h5py.
+# def _cleanup():
+#     for paper in activepapers.storage._papers.values():
+#         paper.close()
 
-import atexit
-atexit.register(_cleanup)
-del atexit
+# import atexit
+# atexit.register(_cleanup)
+# del atexit
 
 #
 # Dereference a reference node

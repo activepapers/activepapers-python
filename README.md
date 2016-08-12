@@ -38,5 +38,3 @@ cd tests
 ```
 
 This launches the test runner on each test script individually. The simpler approach of simply running `nosetests` or `py.test` in directory `tests` leads to a few test failures because the testing framework's import handling conflicts with the implementation of internal modules in ActivePapers.
-
-Note also that under Python 3.4 and 3.5, some test scripts raise exceptions after all tests have run (and passed). This seems to be related to memory cleanup issues with `h5py` when the Python interpreter shuts down.
