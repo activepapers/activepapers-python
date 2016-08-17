@@ -1,3 +1,21 @@
+Release 0.2
+-----------
+
+New features:
+
+ - Read-only access to code and data from an ActivePaper in plain
+   Python scripts. This facilitates developing and testing code
+   that will later be integrated into an ActivePaper.
+
+ - Calclets have read-only access to code and to stack traces,
+   allowing limited forms of introspection.
+
+ - Internal files can be opened in binary mode.
+
+Bug fixes:
+
+ - Improved compatibility with recent versions of Python and h5py.
+
 Release 0.1.4
 -------------
 
