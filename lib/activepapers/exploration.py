@@ -40,7 +40,7 @@ class ActivePaper(object):
         path = path_in_section(path, section)
         if not path.startswith('/'):
             path = section + '/' + path
-        return self.paper.open_internal_file(path, mode, None)
+        return self.paper.open_internal_file(path, mode, 'utf8', None)
 
     def open(self, path, mode='r'):
         return self._open(path, '/data', mode)
