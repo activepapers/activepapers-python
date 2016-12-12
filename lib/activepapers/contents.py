@@ -38,6 +38,9 @@ def open(filename, mode='r'):
 def open_documentation(filename, mode='r'):
     return _open(filename, mode, '/documentation')
 
+def exception_traceback():
+    raise NotImplementedError()
+
 # Make the code in the ActivePapers importable
 import activepapers.execution
 def _get_codelet_and_paper():
