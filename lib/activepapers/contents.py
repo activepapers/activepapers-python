@@ -23,10 +23,9 @@ del ActivePaper
 # Emulate the internal activepapers.contents module
 data = _paper.data
 
-def _open(filename, mode='r'):
+def _open(filename, mode, section):
     from activepapers.utility import path_in_section
-    section = '/data'
-    path = path_in_section(path, section)
+    path = path_in_section(filename, section)
     if not path.startswith('/'):
         path = section + '/' + path
     assert mode == 'r'
