@@ -18,7 +18,7 @@ class Dummy:
 version = Dummy()
 exec(open('lib/activepapers/version.py').read(), version.__dict__)
 
-setup(name='ActivePapers',
+setup(name='ActivePapers.Py',
       version=version.version,
       description='Executable papers containing Python code',
       long_description=long_description,

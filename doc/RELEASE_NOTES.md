@@ -1,3 +1,18 @@
+Release 0.2.2
+-------------
+
+Improvements:
+
+ - Provide a way to skip network-dependent
+   tests in restricted environments
+   (environment variable NO_NETWORK_ACCESS=1)
+
+Bug fixes:
+
+ - Prevent a crash when no home directory is defined
+
+ - Fix a bug in accesses to nested data groups.
+
 Release 0.2.1
 -------------
 
