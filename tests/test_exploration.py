@@ -40,11 +40,12 @@ def test_local_paper():
         make_local_paper(filename)
         check_local_paper(filename)
 
-def test_published_paper():
-    with tempdir.TempDir() as t:
-        library.library = [t]
-        ap = ActivePaperExploration("doi:10.6084/m9.figshare.808595")
-        import time_series
-        ts = np.arange(10)
-        assert time_series.integral(ts, 1)[-1] == 40.5
-        ap.close()
+if "NO_NETWORK_ACCESS" not in os.environ:
+    def test_published_paper():
+        with tempdir.TempDir() as t:
+            library.library = [t]
+            ap = ActivePaperExploration("doi:10.6084/m9.figshare.808595")
+            import time_series
+            ts = np.arange(10)
+            assert time_series.integral(ts, 1)[-1] == 40.5
+            ap.close()
