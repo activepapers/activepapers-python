@@ -1,3 +1,15 @@
+Release 0.2.1
+-------------
+
+Improvements:
+
+ - Internal text files are opened as utf8 rather than ascii.
+
+Bug fixes:
+
+ - Prevent crashes when using Python modules in ActivePapers
+   from scripts not managed by ActivePapers (using activepapers.exploration).
+
 Release 0.2
 -----------
 

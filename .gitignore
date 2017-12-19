@@ -6,4 +6,4 @@ doc/build/
 *pycache*
 examples/*.ap
 tests/*.ap
-lib/ActivePapers.Py.egg-info
+lib/*.egg-info

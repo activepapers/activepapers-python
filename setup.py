@@ -18,7 +18,7 @@ class Dummy:
 version = Dummy()
 exec(open('lib/activepapers/version.py').read(), version.__dict__)
 
-setup(name='ActivePapers.Py',
+setup(name='ActivePapers',
       version=version.version,
       description='Executable papers containing Python code',
       long_description=long_description,
@@ -31,15 +31,16 @@ setup(name='ActivePapers.Py',
       scripts=[os.path.join(script_dir, s) for s in os.listdir(script_dir)],
       platforms=['any'],
       requires=["numpy (>=1.6)", "h5py (>=2.2)", "tempdir (>=0.6)"],
-      provides=["ActivePapers.Py"],
+      provides=["ActivePapers"],
       classifiers=[
           "Development Status :: 3 - Alpha",
           "Intended Audience :: Science/Research",
           "License :: OSI Approved :: BSD License",
           "Operating System :: OS Independent",
           "Programming Language :: Python :: 2.7",
-          "Programming Language :: Python :: 3.2",
-          "Programming Language :: Python :: 3.3",
+          "Programming Language :: Python :: 3.4",
+          "Programming Language :: Python :: 3.5",
+          "Programming Language :: Python :: 3.6",
           "Topic :: Scientific/Engineering",
       ]
   )
