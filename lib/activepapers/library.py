@@ -10,13 +10,17 @@ library = os.environ.get('ACTIVEPAPERS_LIBRARY', None)
 if library is None:
     # This is Unix-only, needs a Windows equivalent
     home = os.environ.get('HOME', None)
-    if home is not None:
+    if home is None:
+        library = ""
+    else:
         library = os.path.join(home, '.activepapers')
         if not os.path.exists(library):
             try:
                 os.mkdir(library)
-            except IOError:
-                library = None
+            except (IOError, OSError):
+                library = ""
+        if not os.path.exists(library):
+            library = ""
 
 library = library.split(':')
 
