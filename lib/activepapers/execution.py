@@ -313,7 +313,9 @@ class DataGroup(object):
         if ap_type == 'reference':
             from activepapers.storage import dereference
             paper, node = dereference(node)
-            if isinstance(node, h5py.Group):
+            if node.name.startswith('/data/'):
+                node = paper.data[node.name[6:]]
+            elif isinstance(node, h5py.Group):
                 node = DataGroup(paper, None, node, None, None)
             else:
                 node = DatasetWrapper(None, node, None)
