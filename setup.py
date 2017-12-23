@@ -30,7 +30,11 @@ setup(name='ActivePapers.Py',
       packages=['activepapers'],
       scripts=[os.path.join(script_dir, s) for s in os.listdir(script_dir)],
       platforms=['any'],
-      requires=["numpy (>=1.6)", "h5py (>=2.2)", "tempdir (>=0.6)"],
+      install_requires=[
+          "numpy>=1.6",
+          "h5py>=2.2",
+          "tempdir>=0.6"
+      ],
       provides=["ActivePapers"],
       classifiers=[
           "Development Status :: 3 - Alpha",
