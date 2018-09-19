@@ -241,14 +241,21 @@ def setup_logging(log, logfile):
 ##################################################
 
 parsed_args = parser.parse_args()
-func = parsed_args.func
+try:
+    func = parsed_args.func
+except AttributeError:
+    func = None
 args = dict(parsed_args.__dict__)
 setup_logging(args['log'], args['logfile'])
-del args['func']
+try:
+    del args['func']
+except KeyError:
+    pass
 del args['log']
 del args['logfile']
 try:
-    func(**args)
+    if func is not None:
+        func(**args)
 except activepapers.cli.CLIExit:
     pass
 finally:
